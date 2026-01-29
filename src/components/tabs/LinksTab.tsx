@@ -1,17 +1,27 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, Download, Scan, Trash2, Copy, ExternalLink } from "lucide-react";
+import { Plus, Search, Download, Scan, Trash2, Copy, ExternalLink, LayoutGrid, LayoutList, Filter } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/Card";
 import { AppButton } from "@/components/AppButton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useToastNotification } from "@/components/ToastProvider";
 import { UrlItem, mockUrls as initialUrls } from "@/data/mockData";
 
+type FilterType = "all" | "pending" | "downloaded" | "scraped";
+type ViewType = "list" | "grid";
+
 export function LinksTab() {
   const [urls, setUrls] = useState<UrlItem[]>(initialUrls);
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
+  const [filter, setFilter] = useState<FilterType>("all");
+  const [viewType, setViewType] = useState<ViewType>("list");
   const { showToast } = useToastNotification();
+
+  const filteredUrls = useMemo(() => {
+    if (filter === "all") return urls;
+    return urls.filter((url) => url.status === filter);
+  }, [urls, filter]);
 
   const handleAddLink = () => {
     if (!inputValue.trim()) {
@@ -19,7 +29,6 @@ export function LinksTab() {
       return;
     }
 
-    // Check for duplicate
     const isDuplicate = urls.some((url) => url.url === inputValue.trim());
     if (isDuplicate) {
       setError("This link is already added");
@@ -33,6 +42,7 @@ export function LinksTab() {
       title: "Fetching title...",
       status: "pending",
       addedAt: new Date(),
+      thumbnail: `https://picsum.photos/seed/${Date.now()}/200/150`,
     };
 
     setUrls((prev) => [newUrl, ...prev]);
@@ -40,7 +50,6 @@ export function LinksTab() {
     setError("");
     showToast("success", "Link added successfully");
 
-    // Simulate title fetch
     setTimeout(() => {
       setUrls((prev) =>
         prev.map((url) =>
@@ -73,6 +82,13 @@ export function LinksTab() {
     window.open(url, "_blank");
   };
 
+  const filters: { label: string; value: FilterType }[] = [
+    { label: "All", value: "all" },
+    { label: "Pending", value: "pending" },
+    { label: "Downloaded", value: "downloaded" },
+    { label: "Scraped", value: "scraped" },
+  ];
+
   return (
     <div className="px-4 py-6 pb-24 space-y-4">
       {/* Header */}
@@ -81,7 +97,7 @@ export function LinksTab() {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between"
       >
-        <h1 className="text-2xl font-bold text-foreground">My Links</h1>
+        <h1 className="text-2xl font-extrabold text-foreground">My Links</h1>
         <span className="text-sm text-muted-foreground">{urls.length} total</span>
       </motion.div>
 
@@ -123,42 +139,175 @@ export function LinksTab() {
         </CardContent>
       </Card>
 
-      {/* URL List */}
+      {/* Filters & View Toggle */}
       <div className="space-y-3">
-        <AnimatePresence mode="popLayout">
-          {urls.map((url, index) => (
-            <motion.div
-              key={url.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ delay: index * 0.05 }}
+        {/* Filter Pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+          {filters.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setFilter(f.value)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+                filter === f.value
+                  ? "bg-foreground text-background"
+                  : "bg-card text-muted-foreground shadow-soft"
+              }`}
             >
-              <Card animate={false}>
-                <CardContent className="pt-4 pb-4">
-                  <div className="space-y-3">
-                    {/* Title and Status */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-foreground truncate">
-                          {url.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground truncate mt-0.5">
-                          {url.url}
-                        </p>
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {/* View Toggle */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {filteredUrls.length} link{filteredUrls.length !== 1 ? "s" : ""}
+          </span>
+          <div className="flex gap-1 p-1 bg-muted rounded-xl">
+            <button
+              onClick={() => setViewType("list")}
+              className={`p-2 rounded-lg transition-colors ${
+                viewType === "list" ? "bg-card shadow-sm" : ""
+              }`}
+            >
+              <LayoutList className={`w-4 h-4 ${viewType === "list" ? "text-foreground" : "text-muted-foreground"}`} />
+            </button>
+            <button
+              onClick={() => setViewType("grid")}
+              className={`p-2 rounded-lg transition-colors ${
+                viewType === "grid" ? "bg-card shadow-sm" : ""
+              }`}
+            >
+              <LayoutGrid className={`w-4 h-4 ${viewType === "grid" ? "text-foreground" : "text-muted-foreground"}`} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* URL List/Grid */}
+      <AnimatePresence mode="popLayout">
+        {viewType === "list" ? (
+          <div className="space-y-3">
+            {filteredUrls.map((url, index) => (
+              <motion.div
+                key={url.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ delay: index * 0.03 }}
+              >
+                <Card animate={false}>
+                  <CardContent className="pt-4 pb-4">
+                    <div className="flex gap-3">
+                      {/* Thumbnail */}
+                      <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden flex-shrink-0">
+                        <img
+                          src={url.thumbnail || `https://picsum.photos/seed/${url.id}/200/150`}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
                       </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-foreground truncate text-sm">
+                              {url.title}
+                            </h3>
+                            <p className="text-xs text-muted-foreground truncate mt-0.5">
+                              {url.url}
+                            </p>
+                          </div>
+                          <StatusBadge status={url.status} />
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-1">
+                          <AppButton
+                            variant="secondary"
+                            size="icon-sm"
+                            onClick={() => handleStatusChange(url.id, "downloaded")}
+                            disabled={url.status === "downloaded"}
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                          </AppButton>
+                          <AppButton
+                            variant="secondary"
+                            size="icon-sm"
+                            onClick={() => handleStatusChange(url.id, "scraped")}
+                            disabled={url.status === "scraped"}
+                          >
+                            <Scan className="w-3.5 h-3.5" />
+                          </AppButton>
+                          <div className="flex-1" />
+                          <AppButton
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleCopy(url.url)}
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </AppButton>
+                          <AppButton
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleOpen(url.url)}
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </AppButton>
+                          <AppButton
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleDelete(url.id)}
+                            className="text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </AppButton>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {filteredUrls.map((url, index) => (
+              <motion.div
+                key={url.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ delay: index * 0.03 }}
+              >
+                <Card animate={false}>
+                  <div className="relative">
+                    {/* Thumbnail */}
+                    <div className="aspect-[4/3] rounded-t-2xl overflow-hidden bg-muted">
+                      <img
+                        src={url.thumbnail || `https://picsum.photos/seed/${url.id}/200/150`}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {/* Status Badge */}
+                    <div className="absolute top-2 right-2">
                       <StatusBadge status={url.status} />
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-2">
+                  </div>
+                  <CardContent className="pt-3 pb-3 px-3">
+                    <h3 className="font-bold text-foreground text-xs line-clamp-2 mb-2">
+                      {url.title}
+                    </h3>
+                    <div className="flex items-center gap-1">
                       <AppButton
                         variant="secondary"
                         size="icon-sm"
                         onClick={() => handleStatusChange(url.id, "downloaded")}
                         disabled={url.status === "downloaded"}
                       >
-                        <Download className="w-4 h-4" />
+                        <Download className="w-3 h-3" />
                       </AppButton>
                       <AppButton
                         variant="secondary"
@@ -166,39 +315,39 @@ export function LinksTab() {
                         onClick={() => handleStatusChange(url.id, "scraped")}
                         disabled={url.status === "scraped"}
                       >
-                        <Scan className="w-4 h-4" />
+                        <Scan className="w-3 h-3" />
                       </AppButton>
                       <div className="flex-1" />
-                      <AppButton
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => handleCopy(url.url)}
-                      >
-                        <Copy className="w-4 h-4" />
-                      </AppButton>
-                      <AppButton
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => handleOpen(url.url)}
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </AppButton>
                       <AppButton
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => handleDelete(url.id)}
                         className="text-destructive hover:bg-destructive/10"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3 h-3" />
                       </AppButton>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </AnimatePresence>
+
+      {filteredUrls.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-12"
+        >
+          <Filter className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
+          <p className="text-muted-foreground">No links found</p>
+          <p className="text-sm text-muted-foreground/70">
+            {filter !== "all" ? "Try changing the filter" : "Add your first link above"}
+          </p>
+        </motion.div>
+      )}
     </div>
   );
 }

@@ -25,7 +25,7 @@ export function StatsTab() {
         className="flex items-center gap-2"
       >
         <TrendingUp className="w-6 h-6 text-primary" />
-        <h1 className="text-2xl font-bold text-foreground">Statistics</h1>
+        <h1 className="text-2xl font-extrabold text-foreground">Statistics</h1>
       </motion.div>
 
       {/* Progress Card */}

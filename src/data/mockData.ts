@@ -4,6 +4,7 @@ export interface UrlItem {
   title: string;
   status: "pending" | "downloaded" | "scraped";
   addedAt: Date;
+  thumbnail?: string;
 }
 
 export interface FolderItem {
@@ -34,6 +35,7 @@ export const mockUrls: UrlItem[] = [
     title: "How to Build Modern Web Applications",
     status: "scraped",
     addedAt: new Date(Date.now() - 86400000 * 2),
+    thumbnail: "https://picsum.photos/seed/1/200/150",
   },
   {
     id: "2",
@@ -41,6 +43,7 @@ export const mockUrls: UrlItem[] = [
     title: "Design Patterns in Frontend Development",
     status: "downloaded",
     addedAt: new Date(Date.now() - 86400000),
+    thumbnail: "https://picsum.photos/seed/2/200/150",
   },
   {
     id: "3",
@@ -48,6 +51,7 @@ export const mockUrls: UrlItem[] = [
     title: "React Best Practices for 2024",
     status: "pending",
     addedAt: new Date(),
+    thumbnail: "https://picsum.photos/seed/3/200/150",
   },
   {
     id: "4",
@@ -55,6 +59,7 @@ export const mockUrls: UrlItem[] = [
     title: "Modern CSS Techniques You Should Know",
     status: "downloaded",
     addedAt: new Date(Date.now() - 86400000 * 3),
+    thumbnail: "https://picsum.photos/seed/4/200/150",
   },
   {
     id: "5",
@@ -62,6 +67,7 @@ export const mockUrls: UrlItem[] = [
     title: "UX Tips for Mobile Applications",
     status: "pending",
     addedAt: new Date(Date.now() - 43200000),
+    thumbnail: "https://picsum.photos/seed/5/200/150",
   },
 ];
 
