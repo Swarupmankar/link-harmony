@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Nunito for Happn-style headings */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
 /* Happn-inspired Design System - Warm, Clean, Premium */
 
 @layer base {
@@ -23,6 +26,9 @@
 
     /* Soft neutral secondary */
     --secondary: 35 20% 92%;
+
+    /* Font family */
+    --font-heading: 'Nunito', sans-serif;
     --secondary-foreground: 25 15% 25%;
 
     /* Muted tones */
@@ -76,7 +82,12 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
   }
 
   /* Mobile container */

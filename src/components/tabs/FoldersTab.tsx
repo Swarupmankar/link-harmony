@@ -71,7 +71,7 @@ export function FoldersTab() {
       >
         <div className="flex items-center gap-2">
           <Folder className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold text-foreground">Folders</h1>
+          <h1 className="text-2xl font-extrabold text-foreground">Folders</h1>
         </div>
         <AppButton
           variant="primary"
