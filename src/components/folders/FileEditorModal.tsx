@@ -8,7 +8,8 @@ import {
   Link as LinkIcon, 
   ExternalLink, 
   Copy, 
-  Trash2 
+  Trash2,
+  MoveRight
 } from "lucide-react";
 import { AppButton } from "@/components/AppButton";
 import { useToastNotification } from "@/components/ToastProvider";
@@ -84,6 +85,11 @@ export function FileEditorModal({
     showToast("info", "Link removed");
   };
 
+  const handleMoveLink = (url: string) => {
+    // For now, just show a toast - in a full implementation this would open a folder picker
+    showToast("info", "Move to folder feature coming soon");
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -145,7 +151,7 @@ export function FileEditorModal({
 
           {/* Extracted Links Section */}
           {extractedLinks.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-3 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <LinkIcon className="w-5 h-5 text-primary" />
                 <div>
@@ -154,7 +160,7 @@ export function FileEditorModal({
                 </div>
               </div>
 
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto overscroll-contain pr-1">
                 {extractedLinks.map((link) => (
                   <motion.div
                     key={link.id}
@@ -178,7 +184,7 @@ export function FileEditorModal({
                         <p className="text-xs text-muted-foreground truncate">{link.url}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-3">
+                    <div className="grid grid-cols-4 gap-2 mt-3">
                       <AppButton 
                         variant="outline" 
                         size="sm"
@@ -200,11 +206,20 @@ export function FileEditorModal({
                       <AppButton 
                         variant="outline" 
                         size="sm"
+                        onClick={() => handleMoveLink(link.url)}
+                        className="flex-1"
+                      >
+                        <MoveRight className="w-3.5 h-3.5" />
+                        Move
+                      </AppButton>
+                      <AppButton 
+                        variant="outline" 
+                        size="sm"
                         onClick={() => handleRemoveLink(link.url)}
                         className="flex-1 text-destructive border-destructive/30 hover:bg-destructive/10"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        Remove
+                        Del
                       </AppButton>
                     </div>
                   </motion.div>
