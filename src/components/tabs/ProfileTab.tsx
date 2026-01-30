@@ -1,20 +1,29 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Link, ChevronRight, Zap, Star, Pencil, ChevronLeft, LogOut, Sun, Moon, Monitor } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/Card";
 import { AppButton } from "@/components/AppButton";
 import { useToastNotification } from "@/components/ToastProvider";
 import { useTheme } from "@/components/ThemeProvider";
+import { LogoutConfirmDialog } from "@/components/LogoutConfirmDialog";
 import { mockProfile } from "@/data/mockData";
 
 export function ProfileTab() {
   const profile = mockProfile;
+  const navigate = useNavigate();
   const { showToast } = useToastNotification();
   const { theme, setTheme } = useTheme();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const profileCompletion = 45;
 
   const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
     showToast("info", "Logged out successfully");
+    navigate("/login");
   };
 
   const themeOptions: { value: "light" | "dark" | "system"; icon: typeof Sun; label: string }[] = [
@@ -202,7 +211,7 @@ export function ProfileTab() {
       <Card>
         <CardContent className="py-4">
           <button
-            onClick={handleLogout}
+            onClick={() => setShowLogoutDialog(true)}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-destructive font-semibold hover:bg-destructive/10 transition-colors"
           >
             <LogOut className="w-5 h-5" />
@@ -215,6 +224,13 @@ export function ProfileTab() {
       <p className="text-center text-xs text-muted-foreground pt-4">
         Version 1.0.0
       </p>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmDialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 }
