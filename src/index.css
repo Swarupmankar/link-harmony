@@ -9,7 +9,7 @@
 
 @layer base {
   :root {
-    /* Warm beige background */
+    /* Warm beige background - Light Mode */
     --background: 35 30% 96%;
     --foreground: 25 15% 15%;
 
@@ -72,6 +72,67 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark Mode */
+    --background: 220 15% 10%;
+    --foreground: 35 30% 96%;
+
+    /* Dark cards */
+    --card: 220 15% 13%;
+    --card-foreground: 35 30% 96%;
+
+    --popover: 220 15% 13%;
+    --popover-foreground: 35 30% 96%;
+
+    /* Golden amber accent */
+    --primary: 40 95% 55%;
+    --primary-foreground: 25 15% 15%;
+
+    /* Dark secondary */
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 35 30% 90%;
+
+    /* Muted tones */
+    --muted: 220 15% 18%;
+    --muted-foreground: 35 20% 60%;
+
+    /* Dark accent */
+    --accent: 220 15% 20%;
+    --accent-foreground: 35 30% 96%;
+
+    /* Status colors - slightly muted for dark mode */
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 145 55% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 40 90% 50%;
+    --warning-foreground: 25 15% 15%;
+
+    --info: 210 65% 55%;
+    --info-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 220 15% 20%;
+    --input: 220 15% 20%;
+    --ring: 40 95% 55%;
+
+    /* Premium card */
+    --premium: 220 20% 8%;
+    --premium-foreground: 35 30% 96%;
+
+    /* Sidebar */
+    --sidebar-background: 220 15% 10%;
+    --sidebar-foreground: 35 30% 96%;
+    --sidebar-primary: 35 30% 96%;
+    --sidebar-primary-foreground: 220 15% 10%;
+    --sidebar-accent: 220 15% 18%;
+    --sidebar-accent-foreground: 35 30% 96%;
+    --sidebar-border: 220 15% 20%;
+    --sidebar-ring: 40 95% 55%;
   }
 }
 

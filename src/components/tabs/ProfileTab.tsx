@@ -1,15 +1,27 @@
 import { motion } from "framer-motion";
-import { User, Link, ChevronRight, Zap, Star, Pencil, ChevronLeft } from "lucide-react";
+import { User, Link, ChevronRight, Zap, Star, Pencil, ChevronLeft, LogOut, Sun, Moon, Monitor } from "lucide-react";
 import { Card, CardContent } from "@/components/Card";
 import { AppButton } from "@/components/AppButton";
 import { useToastNotification } from "@/components/ToastProvider";
+import { useTheme } from "@/components/ThemeProvider";
 import { mockProfile } from "@/data/mockData";
 
 export function ProfileTab() {
   const profile = mockProfile;
   const { showToast } = useToastNotification();
+  const { theme, setTheme } = useTheme();
 
   const profileCompletion = 45;
+
+  const handleLogout = () => {
+    showToast("info", "Logged out successfully");
+  };
+
+  const themeOptions: { value: "light" | "dark" | "system"; icon: typeof Sun; label: string }[] = [
+    { value: "light", icon: Sun, label: "Light" },
+    { value: "dark", icon: Moon, label: "Dark" },
+    { value: "system", icon: Monitor, label: "System" },
+  ];
 
   return (
     <div className="px-4 py-6 pb-24 space-y-4">
@@ -73,6 +85,29 @@ export function ProfileTab() {
                 className="w-full h-full object-cover"
               />
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Theme Selector Card */}
+      <Card>
+        <CardContent className="py-4">
+          <h3 className="text-lg font-bold text-foreground mb-3">Appearance</h3>
+          <div className="flex gap-2">
+            {themeOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setTheme(option.value)}
+                className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-xl transition-all ${
+                  theme === option.value
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                <option.icon className="w-5 h-5" />
+                <span className="text-xs font-semibold">{option.label}</span>
+              </button>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -160,6 +195,19 @@ export function ProfileTab() {
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Logout Button */}
+      <Card>
+        <CardContent className="py-4">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-destructive font-semibold hover:bg-destructive/10 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            Log out
+          </button>
         </CardContent>
       </Card>
 

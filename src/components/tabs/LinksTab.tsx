@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, Download, Scan, Trash2, Copy, ExternalLink, LayoutGrid, LayoutList, Filter } from "lucide-react";
+import { Plus, Search, Download, X, Trash2, Copy, ExternalLink, LayoutGrid, LayoutList, Filter } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/Card";
 import { AppButton } from "@/components/AppButton";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -16,12 +16,28 @@ export function LinksTab() {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [viewType, setViewType] = useState<ViewType>("list");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
   const { showToast } = useToastNotification();
 
   const filteredUrls = useMemo(() => {
-    if (filter === "all") return urls;
-    return urls.filter((url) => url.status === filter);
-  }, [urls, filter]);
+    let result = urls;
+    
+    if (filter !== "all") {
+      result = result.filter((url) => url.status === filter);
+    }
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (url) => 
+          url.title.toLowerCase().includes(query) || 
+          url.url.toLowerCase().includes(query)
+      );
+    }
+    
+    return result;
+  }, [urls, filter, searchQuery]);
 
   const handleAddLink = () => {
     if (!inputValue.trim()) {
@@ -116,25 +132,49 @@ export function LinksTab() {
                 placeholder="Paste a link"
                 className="w-full h-12 px-4 rounded-xl bg-muted border-0 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
-              {error && (
-                <motion.p
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute -bottom-6 left-0 text-xs text-destructive"
-                >
-                  {error}
-                </motion.p>
-              )}
             </div>
-            <div className="flex gap-2 pt-2">
+            {error && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-xs text-destructive"
+              >
+                {error}
+              </motion.p>
+            )}
+            <div className="flex gap-2">
               <AppButton onClick={handleAddLink} variant="primary" className="flex-1">
                 <Plus className="w-4 h-4" />
                 Add
               </AppButton>
-              <AppButton variant="secondary" size="icon">
+              <AppButton 
+                variant={showSearch ? "primary" : "secondary"} 
+                size="icon"
+                onClick={() => setShowSearch(!showSearch)}
+              >
                 <Search className="w-4 h-4" />
               </AppButton>
             </div>
+            
+            {/* Search Input */}
+            <AnimatePresence>
+              {showSearch && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                >
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search links..."
+                    className="w-full h-11 px-4 rounded-xl bg-muted border-0 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    autoFocus
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </CardContent>
       </Card>
@@ -238,7 +278,7 @@ export function LinksTab() {
                             onClick={() => handleStatusChange(url.id, "scraped")}
                             disabled={url.status === "scraped"}
                           >
-                            <Scan className="w-3.5 h-3.5" />
+                            <X className="w-3.5 h-3.5" />
                           </AppButton>
                           <div className="flex-1" />
                           <AppButton
@@ -282,21 +322,19 @@ export function LinksTab() {
                 transition={{ delay: index * 0.03 }}
               >
                 <Card animate={false}>
-                  <div className="relative">
-                    {/* Thumbnail */}
-                    <div className="aspect-[4/3] rounded-t-2xl overflow-hidden bg-muted">
-                      <img
-                        src={url.thumbnail || `https://picsum.photos/seed/${url.id}/200/150`}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {/* Status Badge */}
-                    <div className="absolute top-2 right-2">
-                      <StatusBadge status={url.status} />
-                    </div>
+                  {/* Thumbnail */}
+                  <div className="aspect-[4/3] rounded-t-2xl overflow-hidden bg-muted">
+                    <img
+                      src={url.thumbnail || `https://picsum.photos/seed/${url.id}/200/150`}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <CardContent className="pt-3 pb-3 px-3">
+                    {/* Status Badge - moved below image */}
+                    <div className="mb-2">
+                      <StatusBadge status={url.status} />
+                    </div>
                     <h3 className="font-bold text-foreground text-xs line-clamp-2 mb-2">
                       {url.title}
                     </h3>
@@ -315,7 +353,7 @@ export function LinksTab() {
                         onClick={() => handleStatusChange(url.id, "scraped")}
                         disabled={url.status === "scraped"}
                       >
-                        <Scan className="w-3 h-3" />
+                        <X className="w-3 h-3" />
                       </AppButton>
                       <div className="flex-1" />
                       <AppButton
